@@ -14,14 +14,34 @@ module.exports.initialize = (queue) => {
 
 module.exports.router = (req, res, next = ()=>{}) => {
   console.log('Serving request type ' + req.method + ' for url ' + req.url);
-  res.writeHead(200, headers);
-  if (req.method === 'GET') {
-    const direction = req.url;
-    var sendMe = direction.slice(12);
-    console.log(sendMe);
-    res.write(sendMe);
+  if(req.url === '/background.jpg'){
+      fs.readFile(path.join('.', 'spec', 'water-lg.jpg'), (err,data) => {
+        if (err) {
+          res.writeHead(404, headers);
+        }
+        console.log('Hello Pikachu')
+
+        const buffMan = Buffer.from(data);
+        res.write(data);
+        // res.write(buffMan);
+        // console.log(data)
+        res.end();
+        next();
+      }
+    )
+    // fs.access(req.url, fs.constants.F_OK, (err) => {
+    //   console.log(`${req.url} ${err ? res.writeHead(404, headers): 'exists'}`)
+  } else if (req.method === 'GET') {
+      res.writeHead(200, headers);
+      const direction = req.url;
+      var sendMe = direction.slice(12);
+      res.write(sendMe);
+      res.end();
+      next();
+  } else {
+    res.writeHead(200, headers);
+    res.end();
+    next();
   }
-  res.end();
-  next(); // invoke next() at the end of a request to help with testing!
 };
 
